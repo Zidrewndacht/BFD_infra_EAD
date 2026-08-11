@@ -78,7 +78,7 @@ Você não monitora "se o servidor está online". Você observa **o que o sistem
 | **CD — Entrega Contínua** | O código está **sempre pronto** para ir a produção. | Deploy em staging é automático. Deploy em produção é um clique. |
 | **CD — Deploy Contínuo** | O código vai para produção **automaticamente**. | Se passar nos testes, já está no ar. Sem humano no caminho. |
 
-> **Nota importante:** Deploy Contínuo é raro fora de empresas de grande escala (Netflix, Amazon, GitHub). A maioria das empresas sérias faz **Entrega Contínua** — o humano aprova o deploy, mas não faz o trabalho manual.
+> **Nota importante:** Deploy Contínuo é menos comum fora de empresas de grande escala (Netflix, Amazon, GitHub). A maioria das empresas sérias faz **Entrega Contínua** — o humano aprova o deploy, mas não faz o trabalho manual.
 
 ### 2.2 Um pipeline realista de CI/CD
 
