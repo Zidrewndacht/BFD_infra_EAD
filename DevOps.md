@@ -87,25 +87,29 @@ git push
    │
    ▼
 ┌─────────────────────────────┐
-│ 1. Lint e análise estática  │  (flake8, black, eslint)
+│ 1. Lint e análise estática  │  (ruff, eslint)
 ├─────────────────────────────┤
-│ 2. Testes unitários         │  (pytest, jest)
+│ 2. Auditoria de dependências│  (pip-audit, npm audit)
 ├─────────────────────────────┤
-│ 3. Build da imagem Docker   │  (docker build)
+│ 3. Testes unitários         │  (pytest, jest)
 ├─────────────────────────────┤
-│ 4. Testes de integração     │  (contra banco real, API mockada)
+│ 4. Build da imagem Docker   │  (docker build)
 ├─────────────────────────────┤
-│ 5. Push para registry       │  (Docker Hub, ECR, GHCR)
+│ 5. Testes de integração     │  (contra banco real, API mockada)
 ├─────────────────────────────┤
-│ 6. Deploy em staging        │  (automático)
+│ 6. Push para registry       │  (Docker Hub, ECR, GHCR)
 ├─────────────────────────────┤
-│ 7. Testes E2E / Smoke       │  (Playwright, Cypress)
+│ 7. Deploy em staging        │  (automático)
 ├─────────────────────────────┤
-│ 8. Aprovação manual         │  (ou automático, se tiver confiança)
+│ 8. Testes E2E / Smoke       │  (Playwright, Cypress)
 ├─────────────────────────────┤
-│ 9. Deploy em produção       │  (canary, blue-green ou rolling)
+│ 9. Aprovação manual         │  (ou automático, se tiver confiança)
+├─────────────────────────────┤
+│ 10. Deploy em produção      │  (canary, blue-green ou rolling)
 └─────────────────────────────┘
 ```
+
+> **Nota de ecossistema Node.js:** Se você está aplicando CI em projetos JavaScript, **nunca use `npm install`** em pipelines. Use **`npm ci`** (Clean Install). Ele apaga o `node_modules` existente e instala *exatamente* o que está travado no `package-lock.json`, garantindo builds determinísticos idênticos aos da sua máquina.
 
 ### 2.3 Ferramentas populares (e quando usar cada uma)
 
@@ -114,8 +118,8 @@ git push
 | **GitHub Actions** | Nuvem do GitHub | Grátis até 2000 min/mês | Projetos já no GitHub, times pequenos/médios |
 | **GitLab CI** | Nuvem ou self-hosted | Grátis com limites | Equipes que querem tudo em um lugar só |
 | **Jenkins** | Self-hosted | Grátis (mas paga servidor) | Empresas legadas com necessidades bizarras de customização |
-| **CircleCI / Travis** | Nuvem | Pago | Times que não querem configurar nada |
-| **ArgoCD / Flux** | Dentro do seu cluster K8s | Grátis | GitOps (ver Bloco 6) |
+| **CircleCI** | Nuvem | Pago | Times que não querem configurar nada |
+| **ArgoCD / Flux** | Dentro do seu cluster K8s | Grátis | GitOps (ver Bloco 5.4) |
 
 ### 2.4 Exemplo mínimo: GitHub Actions para um projeto Flask
 
@@ -145,7 +149,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+          pip install pytest ruff pip-audit
+      
+      - name: Rodar Linter
+        run: ruff check .
+      
+      - name: Auditoria de Segurança
+        run: pip-audit
       
       - name: Rodar testes
         run: pytest tests/
@@ -154,8 +164,8 @@ jobs:
 **O que acontece na prática:**
 1. Você abre um Pull Request.
 2. O GitHub sobe uma VM Ubuntu limpa.
-3. Clona seu código, instala Python, roda `pytest`.
-4. Se os testes passarem, aparece um ✅ verde no PR.
+3. Clona seu código, instala Python, roda lint, verifica vulnerabilidades e executa `pytest`.
+4. Se tudo passar, aparece um ✅ verde no PR.
 5. Se falharem, aparece um ❌ vermelho e o merge pode ser bloqueado.
 
 **Isso é CI.** Nada mais, nada menos.
@@ -221,7 +231,6 @@ docker logs <container_id>           # Vê os logs
 ### 3.4 Quando NÃO usar Docker
 
 - **Projetos pequenos com deploy simples** (ex: VPS com `git pull && systemctl restart`).
-- **Aplicações que dependem de hardware específico** (GPU drivers costumam dar trabalho, mas estão melhorando).
 - **Quando a equipe não sabe usar.** Docker mal configurado é pior que não usar Docker.
 
 ---
@@ -231,7 +240,7 @@ docker logs <container_id>           # Vê os logs
 ### 4.1 O problema
 
 Você tem 1 container. Rode com `docker run`.
-Você tem 5 containers. Use `docker-compose`.
+Você tem 5 containers. Use `docker compose`.
 Você tem 500 containers em 50 máquinas, com auto-scaling, failover automático e deploy sem downtime? **Aí você precisa de orquestração.**
 
 ### 4.2 O que um orquestrador faz
@@ -254,7 +263,7 @@ Kubernetes é o padrão da indústria. Mas:
 | Multi-cloud | Um cluster K8s mal mantido vira um pesadelo |
 | Padrão de mercado (empregabilidade) | Overkill para 90% das empresas |
 
-> **Regra prática:** se você tem menos de ~20 serviços e menos de ~1000 req/s, K8s provavelmente é exagero. Use **PaaS** (Render, Railway, Heroku, Fly.io) ou **containers gerenciados** (AWS ECS, Azure Container Apps).
+> **Regra prática:** se você tem menos de ~20 serviços e menos de ~1000 req/s, K8s provavelmente é exagero. Use **PaaS** (Render, Railway, Fly.io) ou **containers gerenciados** (AWS ECS, Azure Container Apps).
 
 ### 4.4 Alternativas mais simples
 
@@ -262,6 +271,7 @@ Kubernetes é o padrão da indústria. Mas:
 - **Nomad (HashiCorp):** bom meio-termo, usado por Cloudflare.
 - **ECS Fargate (AWS) / Container Apps (Azure):** "Kubernetes sem a dor".
 - **Fly.io / Render:** PaaS que esconde a infraestrutura.
+- **Coolify:** PaaS open-source que você roda na sua própria VPS. Excelente meio-termo entre VPS nua e Kubernetes.
 
 ---
 
@@ -281,12 +291,13 @@ Sem IaC, isso é impossível.
 | Ferramenta | O que provisiona | Linguagem |
 | :--- | :--- | :--- |
 | **Terraform** | Qualquer cloud (AWS, Azure, GCP, etc.) | HCL |
+| **OpenTofu** | Qualquer cloud | HCL | Fork open-source real do Terraform (após mudança de licença BSL em 2023). Drop-in replacement. |
 | **Pulumi** | Qualquer cloud | Python/TypeScript/Go |
 | **Ansible** | Configuração de servidores existentes | YAML |
 | **CloudFormation** | Só AWS | YAML/JSON |
 | **Bicep** | Só Azure | DSL própria |
 
-### 5.3 Exemplo mental (Terraform)
+### 5.3 Exemplo mental (Terraform/OpenTofu)
 
 ```hcl
 resource "aws_instance" "web" {
@@ -299,7 +310,7 @@ resource "aws_instance" "web" {
 }
 ```
 
-Roda `terraform apply`, e uma EC2 é criada. Muda o código, roda de novo, e a infraestrutura é atualizada. Apaga? `terraform destroy`.
+Roda `terraform apply` (ou `tofu apply`), e uma EC2 é criada. Muda o código, roda de novo, e a infraestrutura é atualizada. Apaga? `terraform destroy`.
 
 ### 5.4 GitOps — a evolução do IaC
 
@@ -408,7 +419,7 @@ GitHub + GitHub Actions
    ↓
 Docker images em GHCR
    ↓
-Deploy em PaaS (Fly.io, Railway) ou ECS Fargate
+Deploy em PaaS (Fly.io, Railway) ou Coolify self-hosted
    ↓
 Grafana Cloud free tier + logs do PaaS
 ```
@@ -420,7 +431,7 @@ GitOps com ArgoCD
    ↓
 Kubernetes (EKS/GKE/AKS)
    ↓
-Terraform para infraestrutura
+Terraform/OpenTofu para infraestrutura
    ↓
 Stack completo de observabilidade
    ↓
@@ -472,6 +483,8 @@ No `requirements.txt`:
 flask==3.0.0
 gunicorn==21.2.0
 pytest==8.0.0
+ruff==0.3.0
+pip-audit==2.7.0
 ```
 
 ### Passo 3: Criar o workflow
@@ -513,3 +526,5 @@ Abra um PR com um teste quebrado de propósito. Veja o CI falhar. Corrija. Veja 
 - [ ] Diferenciar logs, métricas e traces
 - [ ] Entender por que "na minha máquina funciona" é um problema de engenharia, não de azar
 - [ ] Questionar adoção de ferramentas ("por que precisamos disso?")
+- [ ] Conhecer a bifurcação Terraform/OpenTofu e suas implicações de licença
+- [ ] Usar `npm ci` em vez de `npm install` em pipelines de CI
