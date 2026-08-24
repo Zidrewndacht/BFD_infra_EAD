@@ -495,20 +495,9 @@ Crie `.github/workflows/ci.yml` (como no Bloco 2.4).
 
 Abra um PR com um teste quebrado de propósito. Veja o CI falhar. Corrija. Veja o CI passar. Mergeie.
 
-**Parabéns.** Você fez CI. Sem marketing, sem buzzwords — só engenharia.
-
 ---
 
-## 10: Referências honestas
-
-### Leitura recomendada (sem bullshit)
-- *The Phoenix Project* — Gene Kim (romance, mas mostra bem o "muro da confusão")
-- *Accelerate* — Forsgren, Humble, Kim (os dados por trás do DORA metrics)
-- [DORA Metrics](https://dora.dev/) — as 4 métricas que realmente importam
-- [The Twelve-Factor App](https://12factor.net/) — ainda relevante após 15 anos
-- [Kubernetes is a red flag](https://www.reddit.com/r/devops/comments/kubernetes_red_flags/) — discussão realista no Reddit
-
-### Referências usadas nesta aula
+## 10: Referências
 - [Red Hat — What is DevOps](https://www.redhat.com/pt-br/topics/devops)
 - [IBM — DevOps](https://www.ibm.com/br-pt/think/topics/devops)
 - [AWS — What is DevOps](https://aws.amazon.com/pt/devops/what-is-devops/)
