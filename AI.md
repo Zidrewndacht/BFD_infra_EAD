@@ -370,27 +370,109 @@ Modelo VLM de 3B parâmetros para OCR, lançado em janeiro de 2026. Usa uma abor
 
 Nem toda IA generativa usa transformers de linguagem. Outras arquiteturas são especializadas em diferentes modalidades.
 
-#### Difusão: Geração de Imagens e Vídeo
+### Difusão: Geração de Imagens e Vídeo
 
-Modelos de difusão geram imagens e vídeos através de um processo iterativo de remoção de ruído.
+Modelos de difusão geram imagens e vídeos através de um processo iterativo de remoção de ruído. Em 2026, esses modelos evoluíram significativamente, oferecendo controle preciso sobre composição, estilo, transparência e áudio sincronizado.
 
 **ComfyUI** é uma aplicação de workflow baseada em nós para geração visual com controle profissional. Permite encadear modelos, parâmetros e saídas de forma visual.
 
 **Link:** https://comfy.org/
 
-##### MiniMax H3
+#### Modelos de Geração de Imagens
 
-Modelo omni-modal de geração lançado em julho de 2026. Gera vídeos 2K de até 15 segundos com áudio estéreo nativo.
+##### Krea 2
+
+Modelo construído completamente do zero pela Krea. Focado em diversidade estética, controle de estilo e direção visual expressiva.
 
 **Características:**
-- Geração de vídeo com som
+- Construído do zero (não baseado em Stable Diffusion)
+- Especializado em transferência de estilo e mistura de estilos
+- Versão Turbo: geração em apenas 8 passos de inferência com guidance scale 0.0
+- Saída nativa 2K
+- Foco em exploração artística e mood boards
+
+**Links:**
+- Site: https://www.krea.ai/krea-2
+- Relatório técnico: https://www.krea.ai/blog/krea-2-technical-report
+
+##### Flux2 Klein (4B e 9B)
+
+Família de modelos lançada em janeiro de 2026 pela Black Forest Labs. São os modelos mais rápidos da família Flux, unificando geração e edição de imagem em um único modelo.
+
+**Características:**
+- 4B e 9B parâmetros
+- Step distilled e guidance distilled
+- Apenas 4 passos de inferência necessários
+- Geração sub-segundo em GPUs de consumo
+- Unifica geração e edição em um único checkpoint
+- Ideal para aplicações interativas e previews em tempo real
+
+**Links:**
+- Site: https://bfl.ai/models/flux-2-klein
+- HuggingFace (9B): https://huggingface.co/black-forest-labs/FLUX.2-klein-9B
+- GitHub: https://github.com/black-forest-labs/flux2
+
+##### Ideogram 4
+
+Modelo de 9.3B parâmetros lançado em 3 de junho de 2026. Primeiro modelo open-weight com controle de layout via bounding boxes e renderização de texto frontier-grade em múltiplas línguas.
+
+**Características:**
+- 9.3B parâmetros, open-weight
+- Treinado em captions JSON estruturados
+- Controle de layout via bounding boxes (posicionamento preciso de elementos)
+- Renderização de texto em múltiplas línguas
+- Saída 2K fotorealista
+- Controle sem precedentes sobre composição, estilo, iluminação, paleta de cores
+
+**Links:**
+- Site: https://ideogram.ai/news/ideogram-4.0/ 
+- Blog técnico: https://ideogram.ai/blog/ideogram-4.0/ 
+- HuggingFace (NF4): https://huggingface.co/ideogram-ai/ideogram-4-nf4 
+
+##### Qwen-Image 2.1
+
+Modelo de 7B parâmetros lançado em 20 de setembro de 2026 pela Alibaba Qwen. Unifica geração de imagem, edição e transparência RGBA nativa em um único modelo.
+
+**Características:**
+- 7B parâmetros, open-weight
+- Geração nativa de imagens com transparência (RGBA)
+- Edição de imagens transparentes
+- Extração de sujeitos de fotografias
+- Saída 2K nativa
+- Renderização de texto de alta qualidade
+- Um modelo para geração e edição
+
+**Links:**
+- Blog: https://qwen.ai/blog?id=qwen-image-2.1 
+- HuggingFace: https://huggingface.co/Qwen/Qwen-Image-2.1 
+
+#### Modelos de Geração de Vídeo e Áudio:
+
+##### MiniMax H3
+
+Modelo omni-modal de geração lançado em 31 de julho de 2026 . Gera vídeos 2K de até 15 segundos com áudio estéreo nativo sincronizado. Oferece três modos de operação distintos:
+
+**Modos de Operação:**
+
+1. **T2VA (Text-to-Video-Audio)**: Geração completa de vídeo com áudio a partir de prompt de texto. O modelo gera simultaneamente as cenas visuais e a trilha sonora/efeitos sonoros sincronizados.
+
+2. **FL2VA (First-Last-to-Video-Audio)**: Geração de vídeo a partir do primeiro e último frame fornecidos pelo usuário. O modelo interpola os frames intermediários e gera áudio sincronizado. Ideal para criar transições suaves entre dois estados visuais específicos.
+
+3. **Ref2VA (Reference-to-Video-Audio)**: Geração de vídeo a partir de uma imagem de referência, mantendo consistência visual com o sujeito da imagem original e adicionando áudio sincronizado. Útil para animar imagens estáticas.
+
+**Características:**
+- Geração de vídeo com áudio estéreo nativo
 - Entendimento unificado de texto, imagem, vídeo
 - Até 15 segundos em 2K
 - Open-weight
+- Pipeline de regeneração 2K
+- Três checkpoints especializados (T2VA, FL2VA, Ref2VA)
 
 **Links:**
 - Blog: https://www.minimax.io/blog/minimax-h3
 - HuggingFace: https://huggingface.co/MiniMaxAI/MiniMax-H3
+- GitHub: https://github.com/MiniMax-AI/MiniMax-H3
+- Model Card: https://minimax3.org/minimax-h3-video-model
 
 ##### MiniMax Music 3
 
@@ -463,7 +545,7 @@ Se você não quer rodar modelos localmente, pode usar APIs. O foco deve ser em 
 
 ### OpenRouter
 
-**OpenRouter** é um agregador que permite acessar centenas de modelos open-weight através de uma única API compatível com OpenAI. Você pode escolher qual modelo usar e trocar facilmente.
+**OpenRouter** é um agregador que permite acessar centenas de modelos open-weight através de uma única API compatível com OpenAI. Você pode escolher qual modelo usar e trocar facilmente. Pago por tokens de entrade e saída, custo variável por modelo e fornecedor.
 
 **Link:** https://openrouter.ai/
 
@@ -473,7 +555,7 @@ Alguns provedores oferecem APIs para modelos open-weight específicos:
 
 - **Qwen API** (Alibaba): https://qwen.ai/
 - **DeepSeek API**: https://platform.deepseek.com/
-- dentre outros.
+- **GLM**, **Kimi**, dentre outros.
 
 A vantagem de usar APIs de modelos open-weight: se o provedor fechar ou mudar preços, você pode migrar para outro provedor ou rodar localmente, pois os pesos do modelo são públicos.
 
